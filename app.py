@@ -50,6 +50,20 @@ def agregar_al_carrito():
     return jsonify({'mensaje': 'Producto agregado al carrito'}), 201
 
    
+@app.route ('/carrito/<int:usuario_id>', methods=['GET'])
+def obtener_carrito(usuario_id):
+    try:
+        carrito_items = Carrito.query.filter_by(usuario_id=usuario_id).all()
+        productos_en_carrito = []
+        for item in carrito_items:
+            producto = Producto.query.get(item.producto_id)
+            if producto:
+                productos_en_carrito.append({'id':producto.id, 'nombre': producto.nombre, 'precio': producto.precio, 'cantidad':item.cantidad})
+        return jsonify(productos_en_carrito), 200
+    except Exception as e:
+        print(f"Error al obtener el carrito: {e}")
+        return jsonify({'error': 'Error al procesar la solicitud'}), 500
+
 
 @app.route('/pago', methods=['POST'])
 def procesar_pago():
